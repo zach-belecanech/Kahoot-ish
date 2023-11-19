@@ -33,7 +33,12 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            val playerName = binding.nameTextbox.text.toString()
+
+            val bundle = Bundle()
+            bundle.putString("playerName", playerName)
+
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment, bundle)
         }
     }
 

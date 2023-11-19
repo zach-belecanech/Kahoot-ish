@@ -47,4 +47,11 @@
     <string name="q1">Test Question 1</string>
     <string name="enterGame">Join The Game!</string>
     <string name="q2">Test Question 2</string>
+    <string name="q1_ans">Enter the correct answer for question 1</string>
+    <string name="q2_ans">Enter the correct answer for question 2</string>
+    <string name="host">Host</string>
+    <string name="player">Player</string>
+    <string name="enter_password">Enter the password</string>
+    <string name="enter_the_password_here">Enter the password here</string>
+    <string name="enter">Enter</string>
 </resources>

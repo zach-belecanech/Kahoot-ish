@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "544007820956",
+    "project_id": "kahoot-ish",
+    "storage_bucket": "kahoot-ish.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544007820956:android:73597b5fbd773a3d8eff59",
+        "android_client_info": {
+          "package_name": "com.bignerdranch.android.kahoot_ish"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy8KaGp20nDW1f6heoTrEyeKoZgisGH7g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

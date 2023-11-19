@@ -25,6 +25,18 @@
             android:layout_height="match_parent" />
 
         <TextView
+            android:id="@+id/questionOneAns"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/q1_ans"
+            android:textSize="18sp" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/q1_TextBox_Ans"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
             android:id="@+id/questionTwo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,6 +45,18 @@
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/q2_TextBox"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/questionTwoAns"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/q2_ans"
+            android:textSize="18sp" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/q2_TextBox_Ans"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
