@@ -51,5 +51,9 @@
     <fragment
         android:id="@+id/lobbyFragment"
         android:name="com.bignerdranch.android.kahoot_ish.LobbyFragment"
-        android:label="LobbyFragment" />
+        android:label="LobbyFragment" >
+        <argument
+            android:name="userRole"
+            app:argType="string" />
+    </fragment>
 </navigation>

@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bignerdranch.android.kahoot_ish.databinding.AuthentificationBinding
@@ -39,13 +40,15 @@ class AuthenticationFragment: Fragment() {
                 val passwordEntered = binding.passwordTextBox.text.toString()
                 val database = FirebaseDatabase.getInstance()
                 val myRef = database.getReference("password")
+                val gameStarted = database.getReference("gameStarted")
+                gameStarted.setValue(true)
                 myRef.addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         // This method is called once with the initial value and again
                         // whenever data at this location is updated.
                         val password = dataSnapshot.getValue(String::class.java).toString()
                         if (passwordEntered == password) {
-                            findNavController().navigate(R.id.action_authenticationFragment_to_lobbyFragment)
+                            findNavController().navigate(R.id.action_authenticationFragment_to_lobbyFragment, bundleOf("userRole" to "host"))
                         } else {
                             binding.passwordTextView.text = "Incorrect Password, try again."
                         }

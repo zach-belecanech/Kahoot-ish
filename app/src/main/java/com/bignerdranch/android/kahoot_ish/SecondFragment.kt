@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.bignerdranch.android.kahoot_ish.databinding.FragmentSecondBinding
 import com.google.firebase.database.FirebaseDatabase
+import java.util.UUID
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -20,7 +22,7 @@ class SecondFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-
+    val uniqueUserId = UUID.randomUUID().toString()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,8 +42,20 @@ class SecondFragment : Fragment() {
             val q1_ans = binding.q1TextBoxAns.text.toString()
             val q2_ans = binding.q2TextBoxAns.text.toString()
 
+            val database = FirebaseDatabase.getInstance()
+            val userRef = database.getReference("users")
 
-            findNavController().navigate(R.id.action_SecondFragment_to_lobbyFragment)
+
+            val userInfo = mapOf(
+                "name" to playerName,
+                "questions" to listOf(
+                    mapOf("question" to q1, "answer" to q1_ans),
+                    mapOf("question" to q2, "answer" to q2_ans)
+                )
+            )
+            userRef.child(uniqueUserId).setValue(userInfo)
+
+            findNavController().navigate(R.id.action_SecondFragment_to_lobbyFragment, bundleOf("userRole" to uniqueUserId))
         }
     }
 
@@ -49,12 +63,7 @@ class SecondFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+
 }
 
-data class QuestionData(
-    val playerName: String? = null,
-    val question1: String? = null,
-    val question2: String? = null,
-    val answer1: String? = null,
-    val answer2: String? = null
-)

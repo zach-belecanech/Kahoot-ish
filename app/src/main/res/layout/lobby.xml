@@ -15,5 +15,11 @@
         android:textAlignment="center"
         android:textSize="36dp"/>
 
+    <Button
+        android:id="@+id/startGameButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Button" />
+
 
 </LinearLayout>
