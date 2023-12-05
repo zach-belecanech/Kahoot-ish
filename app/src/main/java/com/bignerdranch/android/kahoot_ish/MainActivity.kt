@@ -10,6 +10,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import com.bignerdranch.android.kahoot_ish.databinding.ActivityMainBinding
+import com.google.firebase.database.FirebaseDatabase
 
 class MainActivity : AppCompatActivity() {
 
@@ -50,5 +51,16 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        updateFirebaseVariable()
+    }
+
+    private fun updateFirebaseVariable() {
+        val database = FirebaseDatabase.getInstance()
+        val gameStarted = database.getReference("gameStarted")
+        gameStarted.setValue(false)
     }
 }

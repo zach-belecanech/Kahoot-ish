@@ -48,11 +48,15 @@ class LobbyFragment: Fragment() {
         }
 
         override fun onDestroy() {
+            updateFirebaseVariable()
             super.onDestroy()
+        }
+
+        private fun updateFirebaseVariable() {
             val database = FirebaseDatabase.getInstance()
+            val gameStarted = database.getReference("gameStarted")
             val userRef = database.getReference("users")
-            if (userInfo != null) {
-                userRef.child(userInfo).removeValue()
-            }
+            userRef.removeValue()
+            gameStarted.setValue(false)
         }
 }
