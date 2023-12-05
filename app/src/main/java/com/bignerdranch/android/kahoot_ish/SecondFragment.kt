@@ -136,7 +136,7 @@ class SecondFragment : Fragment() {
                             val database = FirebaseDatabase.getInstance()
                             val myRef = database.getReference("users")
                             val userInfo = mapOf(
-                                "name" to playerName,
+                                "name" to arguments?.getString("playerName"),
                                 "questions" to listOf(
                                     mapOf("question" to q1, "answer" to q1_ans, "incorrect" to incorrect1),
                                     mapOf("question" to q2, "answer" to q2_ans, "incorrect" to incorrect2)

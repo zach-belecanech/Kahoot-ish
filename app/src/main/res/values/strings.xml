@@ -54,4 +54,6 @@
     <string name="enter_password">Enter the password</string>
     <string name="enter_the_password_here">Enter the password here</string>
     <string name="enter">Enter</string>
+    <string name="welcome_to_the_lobby">Welcome to the Lobby</string>
+    <string name="button_text">Start The Game</string>
 </resources>
