@@ -21,6 +21,8 @@ class LobbyFragment: Fragment() {
         private var _binding: LobbyBinding? = null
         private lateinit var usersAdapter: UsersAdapter
         private val usersList = mutableListOf<User>()
+        private var userChangesListener: ValueEventListener? = null
+        private var gameStartListener: ValueEventListener? = null
 
         // This property is only valid between onCreateView and
         // onDestroyView.
@@ -63,6 +65,9 @@ class LobbyFragment: Fragment() {
 
         override fun onDestroyView() {
             super.onDestroyView()
+            val database = FirebaseDatabase.getInstance()
+            database.getReference("users").removeEventListener(userChangesListener!!)
+            database.getReference("gameStarted").removeEventListener(gameStartListener!!)
             _binding = null
         }
 
@@ -83,7 +88,7 @@ class LobbyFragment: Fragment() {
 
         private fun listenForUserChanges() {
             val databaseReference = FirebaseDatabase.getInstance().getReference("users")
-            databaseReference.addValueEventListener(object : ValueEventListener {
+            userChangesListener = (object : ValueEventListener {
                 @SuppressLint("NotifyDataSetChanged")
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -100,11 +105,12 @@ class LobbyFragment: Fragment() {
                     Toast.makeText(requireContext(), "Error: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
+            databaseReference.addValueEventListener(userChangesListener!!)
         }
 
         private fun listenForGameStart() {
             val databaseReference = FirebaseDatabase.getInstance().getReference("gameStarted")
-            databaseReference.addValueEventListener(object : ValueEventListener {
+            gameStartListener = (object : ValueEventListener {
                 @SuppressLint("NotifyDataSetChanged")
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
@@ -120,7 +126,10 @@ class LobbyFragment: Fragment() {
                     Toast.makeText(requireContext(), "Error: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
             })
+            databaseReference.addValueEventListener(gameStartListener!!)
         }
+
+
 
 
 

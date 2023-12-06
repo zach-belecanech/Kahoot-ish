@@ -26,6 +26,7 @@ class ScoreboardFragment : Fragment() {
     private lateinit var nextRoundView: TextView
     private lateinit var homeButton: Button
     private var countDownTimer: CountDownTimer? = null
+    private var userChangesListener: ValueEventListener? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_scoreboard, container, false)
@@ -76,7 +77,7 @@ class ScoreboardFragment : Fragment() {
 
     private fun loadDataFromFirebase() {
         val databaseReference = FirebaseDatabase.getInstance().getReference("users")
-        databaseReference.addValueEventListener(object : ValueEventListener {
+        userChangesListener = (object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 userScores.clear()
                 for (postSnapshot in snapshot.children) {
@@ -91,10 +92,13 @@ class ScoreboardFragment : Fragment() {
                 Toast.makeText(context, "Something went wrong.", Toast.LENGTH_SHORT).show()
             }
         })
+        databaseReference.addValueEventListener(userChangesListener!!)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        val database = FirebaseDatabase.getInstance()
+        database.getReference("users").removeEventListener(userChangesListener!!)
         countDownTimer?.cancel()
     }
 

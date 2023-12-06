@@ -40,7 +40,7 @@ class AuthenticationFragment: Fragment() {
                 val passwordEntered = binding.passwordTextBox.text.toString()
                 val database = FirebaseDatabase.getInstance()
                 val myRef = database.getReference("password")
-                val gameStarted = database.getReference("gameStarted")
+                val gameStarted = database.getReference("roomCreated")
                 gameStarted.setValue(true)
                 myRef.addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {

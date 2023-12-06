@@ -51,27 +51,7 @@ class SecondFragment : Fragment() {
 
         super.onViewCreated(view, savedInstanceState)
 
-        //Check if the game has started
-        val database = FirebaseDatabase.getInstance()
-        val myRef = database.getReference("roomCreated")
-        myRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            @SuppressLint("SuspiciousIndentation")
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val value = snapshot.getValue(Boolean::class.java)
-                        if (value == true) {
-                            binding.buttonEnterGame.visibility = View.VISIBLE
-                        } else {
-                            binding.buttonEnterGame.visibility = View.INVISIBLE
-                        }
-                }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error
-                Toast.makeText(requireContext(), "Error: ${error.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
         binding.buttonEnterGame.setOnClickListener {
             val q1 = binding.q1TextBox.text.toString()
             val q2 = binding.q2TextBox.text.toString()
@@ -83,10 +63,32 @@ class SecondFragment : Fragment() {
                 Toast.makeText(requireContext(), "Please fill out all fields.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            // Generate the prompt for GPT-3
-            val prompt1 = "Please respond to the following questions with three incorrect answers each, always followed by commas. Here is the first question: $q1 Here is the second question: $q2  For the response, just combine the 2 answers into one line and just include the 3 answers, not the original question."
-            askGpt3(prompt1, q1, q2, q1_ans, q2_ans)
-            findNavController().navigate(R.id.action_SecondFragment_to_lobbyFragment, bundleOf("userRole" to "player", "user_id" to uniqueUserId))
+
+
+            //Check if the game has started
+            val database = FirebaseDatabase.getInstance()
+            val myRef = database.getReference("roomCreated")
+            myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                @SuppressLint("SuspiciousIndentation")
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val value = snapshot.getValue(Boolean::class.java)
+                        if (value == true) {
+                            // Generate the prompt for GPT-3
+                            val prompt1 = "Please respond to the following questions with three incorrect answers each, always followed by commas. Here is the first question: $q1 Here is the second question: $q2  For the response, just combine the 2 answers into one line and just include the 3 answers, not the original question."
+                            askGpt3(prompt1, q1, q2, q1_ans, q2_ans)
+                            findNavController().navigate(R.id.action_SecondFragment_to_lobbyFragment, bundleOf("userRole" to "player", "user_id" to uniqueUserId))
+                        } else {
+                            Toast.makeText(requireContext(), "Please wait for the host to start the game.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                    Toast.makeText(requireContext(), "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 

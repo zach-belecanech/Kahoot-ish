@@ -39,6 +39,18 @@ class QuestionFragment : Fragment() {
         option2 = view.findViewById(R.id.optionButton2)
         option3 = view.findViewById(R.id.optionButton3)
         option4 = view.findViewById(R.id.optionButton4)
+        
+        if (arguments?.getString("user_id") == "host") {
+            option1.isEnabled = false
+            option2.isEnabled = false
+            option3.isEnabled = false
+            option4.isEnabled = false
+        } else {
+            option1.isEnabled = true
+            option2.isEnabled = true
+            option3.isEnabled = true
+            option4.isEnabled = true
+        }
 
 
         questions = arguments?.getParcelableArray("questions")?.map { it as Question }
@@ -54,7 +66,12 @@ class QuestionFragment : Fragment() {
         }
         questions?.getOrNull(questionNum)?.let { question ->
             questionTextView.text = question.question
-            val incorrectAnswers = question.incorrect.split(",")
+
+            var incorrectAnswers = if (question.incorrect != "") {
+                question.incorrect.split(",")
+            } else {
+                listOf<String>("No incorrect answers found.", "No incorrect answers found.", "No incorrect answers found.")
+            }
             val correctAnswer = question.answer
             val allAnswers = incorrectAnswers + correctAnswer
             val shuffledAnswers = allAnswers.shuffled()
@@ -64,6 +81,7 @@ class QuestionFragment : Fragment() {
             option4.text = shuffledAnswers[3]
             startCountdown()
         }
+        optionChosen = option1
         option1.setOnClickListener {
             if (option1.text == questions?.getOrNull(questionNum)?.answer) {
                 score += (countdownNumber * 10)
@@ -114,6 +132,7 @@ class QuestionFragment : Fragment() {
                     countdownNumber--
                     handler.postDelayed(this, 1000)
                 } else {
+                    countdownTextView.text = "Time's up!"
                     displayCorrectAnswer()
                 }
             }
@@ -125,6 +144,7 @@ class QuestionFragment : Fragment() {
         // Update this method to display the correct answer
         val correctAnswer = questions?.getOrNull(questionNum)?.answer ?: "Unknown"
         questionTextView.text = "Answer: $correctAnswer"
+
         if (optionChosen.text == correctAnswer) {
             optionChosen.setBackgroundColor(android.graphics.Color.GREEN)
         } else {
