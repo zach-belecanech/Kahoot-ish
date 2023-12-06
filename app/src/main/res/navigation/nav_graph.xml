@@ -72,6 +72,12 @@
         <argument
             android:name="user_id"
             app:argType="string" />
+        <argument
+            android:name="questionNum"
+            app:argType="integer" />
+        <argument
+            android:name="score"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/questionFragment"
@@ -88,10 +94,35 @@
         <action
             android:id="@+id/action_questionFragment_to_scoreboardFragment"
             app:destination="@id/scoreboardFragment" />
+        <argument
+            android:name="questionNum"
+            app:argType="integer" />
+        <argument
+            android:name="score"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/scoreboardFragment"
         android:name="com.bignerdranch.android.kahoot_ish.ScoreboardFragment"
         android:label="fragment_scoreboard"
-        tools:layout="@layout/fragment_scoreboard" />
+        tools:layout="@layout/fragment_scoreboard" >
+        <argument
+            android:name="user_id"
+            app:argType="string" />
+        <argument
+            android:name="questionNum"
+            app:argType="integer" />
+        <argument
+            android:name="score"
+            app:argType="integer" />
+        <argument
+            android:name="gameDone"
+            app:argType="boolean" />
+        <action
+            android:id="@+id/action_scoreboardFragment_to_readyScreenFragment"
+            app:destination="@id/readyScreenFragment" />
+        <action
+            android:id="@+id/action_scoreboardFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>

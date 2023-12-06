@@ -60,4 +60,9 @@
     <string name="ready_countdown">5</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="round_1">Round 1</string>
+    <string name="round">Round</string>
+    <string name="next_round_in">Next round in:</string>
+    <string name="scoreboard">Scoreboard</string>
+    <string name="return_to_home">Back to Main Menu</string>
 </resources>

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -52,12 +53,12 @@ class LobbyFragment: Fragment() {
                 adapter = usersAdapter
             }
             binding.startGameButton.setOnClickListener {
-                val bundle = Bundle()
-                bundle.putString("userRole", arguments?.getString("userRole"))
-
-                findNavController().navigate(R.id.action_lobbyFragment_to_readyScreenFragment)
+                val database = FirebaseDatabase.getInstance()
+                val gameStarted = database.getReference("gameStarted")
+                gameStarted.setValue(true)
             }
             listenForUserChanges()
+            listenForGameStart()
         }
 
         override fun onDestroyView() {
@@ -92,6 +93,26 @@ class LobbyFragment: Fragment() {
                             user?.let { usersList.add(it) }
                         }
                         usersAdapter.notifyDataSetChanged()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(requireContext(), "Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+
+        private fun listenForGameStart() {
+            val databaseReference = FirebaseDatabase.getInstance().getReference("gameStarted")
+            databaseReference.addValueEventListener(object : ValueEventListener {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val gameStarted = snapshot.getValue(Boolean::class.java)
+                        if (gameStarted == true) {
+                            findNavController().navigate(R.id.action_lobbyFragment_to_readyScreenFragment, bundleOf("user_id" to arguments?.getString("user_id"),
+                                "questionNum" to 0, "score" to 0))
+                        }
                     }
                 }
 

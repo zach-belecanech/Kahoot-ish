@@ -51,7 +51,10 @@ class ReadyScreenFragment : Fragment() {
 
     private fun goToNextFragment() {
         // Replace with your code to transition to the next fragment
-        findNavController().navigate(R.id.action_readyScreenFragment_to_questionFragment, bundleOf("questions" to questionBank.toTypedArray(), "user_id" to arguments?.getString("user_id").toString()))
+        findNavController().navigate(R.id.action_readyScreenFragment_to_questionFragment,
+            bundleOf("questions" to questionBank.toTypedArray(),
+                "user_id" to arguments?.getString("user_id").toString(),
+                "questionNum" to arguments?.getInt("questionNum"), "score" to arguments?.getInt("score")))
     }
 
     private fun loadQuestionsFromFirebase() {
