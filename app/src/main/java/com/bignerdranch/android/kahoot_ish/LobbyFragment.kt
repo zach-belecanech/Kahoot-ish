@@ -1,5 +1,6 @@
 package com.bignerdranch.android.kahoot_ish
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bignerdranch.android.kahoot_ish.databinding.LobbyBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,7 +19,7 @@ class LobbyFragment: Fragment() {
 
         private var _binding: LobbyBinding? = null
         private lateinit var usersAdapter: UsersAdapter
-        private val usersList = mutableListOf<String>()
+        private val usersList = mutableListOf<User>()
 
         // This property is only valid between onCreateView and
         // onDestroyView.
@@ -45,8 +47,16 @@ class LobbyFragment: Fragment() {
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             usersAdapter = UsersAdapter(usersList)
-            _binding?.usersRecyclerView?.adapter = usersAdapter
+            _binding?.usersRecyclerView?.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = usersAdapter
+            }
+            binding.startGameButton.setOnClickListener {
+                val bundle = Bundle()
+                bundle.putString("userRole", arguments?.getString("userRole"))
 
+                findNavController().navigate(R.id.action_lobbyFragment_to_readyScreenFragment)
+            }
             listenForUserChanges()
         }
 
@@ -64,23 +74,24 @@ class LobbyFragment: Fragment() {
             val database = FirebaseDatabase.getInstance()
             val gameStarted = database.getReference("gameStarted")
             val userRef = database.getReference("users")
-            userRef.removeValue()
-            gameStarted.setValue(false)
+            if (arguments?.getString("userRole") == "host") {
+                userRef.removeValue()
+                gameStarted.setValue(false)
+            }
         }
 
         private fun listenForUserChanges() {
             val databaseReference = FirebaseDatabase.getInstance().getReference("users")
             databaseReference.addValueEventListener(object : ValueEventListener {
+                @SuppressLint("NotifyDataSetChanged")
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
                         usersList.clear()
-                        snapshot.children.forEach {
-                            val userName = it.getValue(String::class.java)
-                            if (userName != null) {
-                                usersList.add(userName)
-                            }
-                        usersAdapter.notifyDataSetChanged()
+                        for (childSnapshot in snapshot.children) {
+                            val user = childSnapshot.getValue(User::class.java)
+                            user?.let { usersList.add(it) }
                         }
+                        usersAdapter.notifyDataSetChanged()
                     }
                 }
 
@@ -90,9 +101,8 @@ class LobbyFragment: Fragment() {
             })
         }
 
-        private fun setupRecyclerView(userNames: List<String>) {
-            val adapter = UsersAdapter(userNames)
-            _binding?.usersRecyclerView?.adapter = adapter
-        }
+
+
+        data class User(val name: String? = null)
 
 }

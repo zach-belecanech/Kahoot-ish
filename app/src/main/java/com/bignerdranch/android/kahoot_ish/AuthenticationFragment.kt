@@ -48,7 +48,7 @@ class AuthenticationFragment: Fragment() {
                         // whenever data at this location is updated.
                         val password = dataSnapshot.getValue(String::class.java).toString()
                         if (passwordEntered == password) {
-                            findNavController().navigate(R.id.action_authenticationFragment_to_lobbyFragment, bundleOf("userRole" to "host"))
+                            findNavController().navigate(R.id.action_authenticationFragment_to_lobbyFragment, bundleOf("userRole" to "host", "user_id" to "host"))
                         } else {
                             binding.passwordTextView.text = "Incorrect Password, try again."
                         }
@@ -59,8 +59,6 @@ class AuthenticationFragment: Fragment() {
                         Log.w("Failed to read value.", error.toException())
                     }
                 })
-
-
             }
 
         }

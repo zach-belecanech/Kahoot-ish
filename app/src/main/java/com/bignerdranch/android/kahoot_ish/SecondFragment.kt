@@ -1,5 +1,6 @@
 package com.bignerdranch.android.kahoot_ish
 
+import android.annotation.SuppressLint
 import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
@@ -52,8 +53,9 @@ class SecondFragment : Fragment() {
 
         //Check if the game has started
         val database = FirebaseDatabase.getInstance()
-        val myRef = database.getReference("gameStarted")
+        val myRef = database.getReference("roomCreated")
         myRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            @SuppressLint("SuspiciousIndentation")
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     val value = snapshot.getValue(Boolean::class.java)
@@ -82,10 +84,9 @@ class SecondFragment : Fragment() {
                 return@setOnClickListener
             }
             // Generate the prompt for GPT-3
-            val prompt1 = "Give three incorrect answers in a comma separated list for these questions: $q1, and $q2. Please separate each answer with a colon."
+            val prompt1 = "Please respond to the following questions with three incorrect answers each, always followed by commas. Here is the first question: $q1 Here is the second question: $q2  For the response, just combine the 2 answers into one line and just include the 3 answers, not the original question."
             askGpt3(prompt1, q1, q2, q1_ans, q2_ans)
-            findNavController().navigate(R.id.action_SecondFragment_to_lobbyFragment, bundleOf("userRole" to "player"))
-
+            findNavController().navigate(R.id.action_SecondFragment_to_lobbyFragment, bundleOf("userRole" to "player", "user_id" to uniqueUserId))
         }
     }
 
@@ -130,19 +131,38 @@ class SecondFragment : Fragment() {
                         if (response.isSuccessful) {
                             val chatResponse = response.body()
                             val answers = chatResponse?.choices?.get(0)?.message?.content
-                            val incorrect1 = answers?.split(":")?.get(0)
-                            val incorrect2 = answers?.split(":")?.get(1)
+                            val (incorrect1, incorrect2) = splitAtFourthComma(answers ?: "")
                             Log.d(TAG, "The GPT Response is: $incorrect1 and $incorrect2")
                             val database = FirebaseDatabase.getInstance()
-                            val myRef = database.getReference("users")
+                            val userRef = database.getReference("users")
+                            val questionsRef = database.getReference("questions")
                             val userInfo = mapOf(
-                                "name" to arguments?.getString("playerName"),
-                                "questions" to listOf(
+                                "name" to arguments?.getString("playerName")
+                            )
+                            val questionInfo = listOf(
                                     mapOf("question" to q1, "answer" to q1_ans, "incorrect" to incorrect1),
                                     mapOf("question" to q2, "answer" to q2_ans, "incorrect" to incorrect2)
-                                )
                             )
-                            myRef.child(uniqueUserId).setValue(userInfo)
+                            userRef.child(uniqueUserId).setValue(userInfo)
+                            // Check if there is a reference to questions already
+                            questionsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    if (snapshot.exists()) {
+                                        // If the reference exists, add each question to the questions reference
+                                        questionInfo.forEach { question ->
+                                            questionsRef.push().setValue(question)
+                                        }
+                                    } else {
+                                        // If the reference doesn't exist, set the value directly
+                                        questionsRef.setValue(questionInfo)
+                                    }
+                                }
+
+                                override fun onCancelled(databaseError: DatabaseError) {
+                                    // Handle possible errors
+                                    Toast.makeText(requireContext(), "Error: ${databaseError.message}", Toast.LENGTH_SHORT).show()
+                                }
+                            })
                         } else {
                             // Handle API errors
                             // For example, display a Toast with the error message
@@ -176,6 +196,20 @@ class SecondFragment : Fragment() {
                 onResult(null)
             }
         })
+    }
+
+    fun splitAtFourthComma(input: String): Pair<String, String> {
+        var commaCount = 0
+        val index = input.indexOfFirst {
+            if (it == ',') commaCount++
+            commaCount == 3
+        }
+
+        return if (index != -1) {
+            input.substring(0, index) to input.substring(index + 1)
+        } else {
+            input to ""
+        }
     }
 
 

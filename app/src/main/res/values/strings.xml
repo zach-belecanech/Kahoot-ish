@@ -56,4 +56,8 @@
     <string name="enter">Enter</string>
     <string name="welcome_to_the_lobby">Welcome to the Lobby</string>
     <string name="button_text">Start The Game</string>
+    <string name="ready_screen_title">Ready?</string>
+    <string name="ready_countdown">5</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
