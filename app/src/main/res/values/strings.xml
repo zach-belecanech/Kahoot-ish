@@ -65,4 +65,5 @@
     <string name="next_round_in">Next round in:</string>
     <string name="scoreboard">Scoreboard</string>
     <string name="return_to_home">Back to Main Menu</string>
+    <string name="save_screenshot">Save Screenshot</string>
 </resources>

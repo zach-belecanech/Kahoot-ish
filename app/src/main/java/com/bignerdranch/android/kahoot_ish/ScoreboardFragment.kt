@@ -1,5 +1,6 @@
 package com.bignerdranch.android.kahoot_ish
 
+import android.content.ContentValues
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
@@ -17,6 +18,15 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 class ScoreboardFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
@@ -27,6 +37,7 @@ class ScoreboardFragment : Fragment() {
     private lateinit var homeButton: Button
     private var countDownTimer: CountDownTimer? = null
     private var userChangesListener: ValueEventListener? = null
+    private lateinit var saveScreenshotButton: Button
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_scoreboard, container, false)
@@ -35,6 +46,7 @@ class ScoreboardFragment : Fragment() {
         roundView = view.findViewById(R.id.roundTextView)
         nextRoundView = view.findViewById(R.id.nextRoundTextView)
         homeButton = view.findViewById(R.id.returnToHomeButton)
+        saveScreenshotButton = view.findViewById(R.id.saveScreenshotButton)
         homeButton.visibility = View.GONE
         recyclerView.layoutManager = LinearLayoutManager(context)
         userScores = mutableListOf()
@@ -44,9 +56,14 @@ class ScoreboardFragment : Fragment() {
         roundView.text = "Round ${roundNum + 1}"
         loadDataFromFirebase()
 
+
         if (arguments?.getBoolean("gameDone") == true) {
             nextRoundView.text = "Game Over!"
             homeButton.visibility = View.VISIBLE
+            saveScreenshotButton.visibility = View.VISIBLE
+            saveScreenshotButton.setOnClickListener {
+                takeScreenshotAndSave()
+            }
             homeButton.setOnClickListener {
                 updateFirebaseVariable()
                 findNavController().navigate(R.id.action_scoreboardFragment_to_homeFragment)
@@ -114,5 +131,43 @@ class ScoreboardFragment : Fragment() {
         questionRef.removeValue()
         roomCreated.setValue(false)
 
+    }
+
+    private fun takeScreenshotAndSave() {
+        val bitmap = takeScreenshot()
+        saveImageToGallery(bitmap)
+    }
+
+    private fun takeScreenshot(): Bitmap {
+        val rootView = activity?.window?.decorView?.rootView
+        val bitmap = Bitmap.createBitmap(rootView!!.width, rootView.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        rootView.draw(canvas)
+        return bitmap
+    }
+
+    private fun saveImageToGallery(bitmap: Bitmap) {
+        val filename = "screenshot_${Calendar.getInstance().timeInMillis}.png"
+        val fos: FileOutputStream
+        val imageUri: Uri
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            }
+        }
+
+        // Inserting the contentValues to contentResolver and getting the Uri
+        val resolver = activity?.contentResolver
+        imageUri = resolver?.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)!!
+        fos = (resolver.openOutputStream(imageUri) as FileOutputStream?)!!
+
+        // Writing the bitmap to the Uri obtained
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+        fos.flush()
+        fos.close()
+
+        Toast.makeText(context, "Screenshot saved to Gallery", Toast.LENGTH_SHORT).show()
     }
 }
